@@ -162,9 +162,21 @@ public class DefaultCacheFactory implements AbstractCache{
 	@Override
 	public void put(String key, Object value, long intervalTime) {
 		Gson gson = new Gson();
-		if(null != value)
-		{
-			putToMap(key,gson.toJson(value) , intervalTime);
+		if (null != value) {
+			if (this.cType == CacheType.MEMORY) {
+				if (intervalTime > 0) {
+					Entry entry = new Entry();
+					entry.setContent(gson.toJson(value));
+					entry.setClassName(value.getClass().getName());
+					entry.setTime(System.currentTimeMillis());
+					entry.setDeadLine(intervalTime);
+					cacheMap.put(key, entry);
+				} else {
+					Entry entry = new Entry();
+					entry.setContent(String.valueOf(value));
+					cacheMap.put(key, entry);
+				}
+			}
 		}
 	}
 
@@ -332,9 +344,12 @@ public class DefaultCacheFactory implements AbstractCache{
 				if(cacheMap.get(key).isValide())
 				{
 					Gson gson = new Gson();
-					Type type = new TypeToken<Object>(){}.getType();
-					return gson.fromJson(cacheMap.get(key).getContent(),type);
-					
+					try {
+						return gson.fromJson(cacheMap.get(key).getContent(),Class.forName(cacheMap.get(key).getClassName()));
+					} catch (ClassNotFoundException e) {
+						e.printStackTrace();
+					}
+					return null;
 				}
 				else
 				{

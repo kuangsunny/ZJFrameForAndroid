@@ -6,6 +6,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.sunny.aframe.cache.AbstractCache;
 import org.sunny.aframe.cache.domain.Entry;
 
@@ -100,12 +103,12 @@ public class DefaultCacheFactory implements AbstractCache{
 	}
 
 	@Override
-	public void put(String key, JsonObject json) {
+	public void put(String key, JSONObject json) {
 		put(key, json,-1l);
 	}
 
 	@Override
-	public void put(String key, JsonArray json) {
+	public void put(String key, JSONArray json) {
 		put(key, json,-1l);
 	}
 
@@ -127,6 +130,10 @@ public class DefaultCacheFactory implements AbstractCache{
 				entry.setContent(String.valueOf(value));
 				cacheMap.put(key, entry);
 			}
+		}
+		else if(this.cType == CacheType.DB)
+		{
+			
 		}
 	}
 	@Override
@@ -190,7 +197,7 @@ public class DefaultCacheFactory implements AbstractCache{
 	}
 
 	@Override
-	public void put(String key, JsonObject json, long intervalTime) {
+	public void put(String key, JSONObject json, long intervalTime) {
 		if(null != json)
 		{
 			putToMap(key,json.toString() , intervalTime);
@@ -198,8 +205,8 @@ public class DefaultCacheFactory implements AbstractCache{
 	}
 
 	@Override
-	public void put(String key, JsonArray json, long intervalTime) {
-		if(null != json && json.size()>0)
+	public void put(String key, JSONArray json, long intervalTime) {
+		if(null != json && json.length()>0)
 		{
 			putToMap(key,json.toString() , intervalTime);
 		}
@@ -362,17 +369,67 @@ public class DefaultCacheFactory implements AbstractCache{
 	}
 
 	@Override
-	public Set<?> getSet(String key, Set<?> defaultValue) {
+		public Set<?> getSet(String key, Set<?> defaultValue) {
+	
+			if (this.cType == CacheType.MEMORY) {
+				if (null == cacheMap.get(key)) {
+					return defaultValue;
+				} else {
+					if (cacheMap.get(key).isValide()) {
+						Gson gson = new Gson();
+						Type type = new TypeToken<Set<?>>() {
+						}.getType();
+						return gson.fromJson(cacheMap.get(key).getContent(), type);
+					} else {
+						cacheMap.remove(key);
+						return defaultValue;
+					}
+				}
+			}
+			return null;
+		}
+
+	@Override
+	public JSONObject getJsonObject(String key, JSONObject defaultValue) {
+		if (this.cType == CacheType.MEMORY) {
+			if (null == cacheMap.get(key)) {
+				return defaultValue;
+			} else {
+				if (cacheMap.get(key).isValide()) {
+					try {
+						return new JSONObject(cacheMap.get(key).getContent());
+					} catch (JSONException e) {
+						e.printStackTrace();
+					}
+					
+				} else {
+					cacheMap.remove(key);
+					return defaultValue;
+				}
+			}
+		}
 		return null;
 	}
 
 	@Override
-	public JsonObject getJsonObject(String key, JsonObject defaultValue) {
-		return null;
-	}
-
-	@Override
-	public JsonArray getJsonArray(String key, JsonArray defaultValue) {
+	public JSONArray getJsonArray(String key, JSONArray defaultValue) {
+		if (this.cType == CacheType.MEMORY) {
+			if (null == cacheMap.get(key)) {
+				return defaultValue;
+			} else {
+				if (cacheMap.get(key).isValide()) {
+					try {
+						return new JSONArray(cacheMap.get(key).getContent());
+					} catch (JSONException e) {
+						e.printStackTrace();
+					}
+					
+				} else {
+					cacheMap.remove(key);
+					return defaultValue;
+				}
+			}
+		}
 		return null;
 	}
 

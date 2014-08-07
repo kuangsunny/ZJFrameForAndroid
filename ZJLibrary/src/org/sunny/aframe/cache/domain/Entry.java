@@ -2,6 +2,8 @@ package org.sunny.aframe.cache.domain;
 
 import java.io.Serializable;
 
+import org.sunny.aframe.db.annotation.Table;
+@Table(name = "entry")
 public class Entry implements Serializable {
 
 	/**
@@ -12,6 +14,8 @@ public class Entry implements Serializable {
 	private String className;
 	
 	private String content;
+	
+	private String key;
 	
 	private long time;
 	
@@ -47,6 +51,16 @@ public class Entry implements Serializable {
 
 	public void setClassName(String className) {
 		this.className = className;
+	}
+
+	
+	
+	public String getKey() {
+		return key;
+	}
+
+	public void setKey(String key) {
+		this.key = key;
 	}
 
 	public boolean isValide()

@@ -56,7 +56,7 @@ public class DefaultCacheFactory implements AbstractCache {
 		} else if (type == CacheType.FILE) {
 			if (null == fileInstance) {
 				fileInstance = new DefaultCacheFactory();
-			}
+			} 
 			return fileInstance;
 		} else if (type == CacheType.MEMORY) {
 			if (null == memoryInstance) {

@@ -2,6 +2,7 @@ package org.sunny.aframe.cache.domain;
 
 import java.io.Serializable;
 
+import org.sunny.aframe.db.annotation.Id;
 import org.sunny.aframe.db.annotation.Table;
 @Table(name = "entry")
 public class Entry implements Serializable {
@@ -10,7 +11,8 @@ public class Entry implements Serializable {
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-	
+	@Id
+	private String id;
 	private String className;
 	
 	private String content;
